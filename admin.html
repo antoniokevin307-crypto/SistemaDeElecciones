@@ -26,36 +26,49 @@
                 <line x1="3" y1="9" x2="21" y2="9"></line>
                 <line x1="9" y1="21" x2="9" y2="9"></line>
             </svg>
-            Panel Admin - TSE
+            Panel de Control - TSE
         </a>
         <div class="nav-links">
-            <span id="user-email" style="font-weight: 500; margin-right: 1rem; color: var(--text-muted);"></span>
-            <button id="btn-logout" class="btn"
-                style="padding: 0.5rem 1rem; background: transparent; border: 1px solid var(--border-color);">Cerrar
-                Sesión</button>
+            <span id="user-email" style="font-weight: 600; color: var(--text-muted); align-self: center;"></span>
+            <button id="btn-logout" class="btn btn-primary"
+                style="background: white; color: var(--sv-blue); border: 1px solid var(--sv-blue); box-shadow: none;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                Cerrar Sesión</button>
         </div>
     </nav>
 
     <div class="container">
-        <header class="page-header">
-            <h1 class="page-title">Ingreso de Actas Electorales</h1>
-            <p class="page-subtitle">Sistema de registro oficial de votos por JRV.</p>
+        <header class="page-header" style="text-align: left;">
+            <div
+                style="display: inline-block; padding: 0.4rem 0.8rem; background: #DBEAFE; color: #1E40AF; border-radius: 8px; font-size: 0.8rem; font-weight: 700; margin-bottom: 1rem;">
+                DIGITADOR AUTORIZADO
+            </div>
+            <h1 class="page-title" style="margin-left: 0;">Registro de Actas JRV</h1>
+            <p class="page-subtitle" style="margin-left: 0;">Ingrese los resultados oficiales del escrutinio por cada
+                urna.</p>
         </header>
 
         <div class="dashboard-grid">
-            <div class="card" style="grid-column: span 12; max-width: 800px; margin: 0 auto;">
-                <h2 class="card-title">Nueva Acta</h2>
-
+            <div class="card"
+                style="grid-column: span 12; max-width: 900px; margin: 0 auto; border-top: 4px solid var(--sv-blue);">
                 <div id="admin-alert" class="alert hidden"></div>
 
                 <form id="acta-form">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem;">
-                        <div class="form-group" style="margin-bottom: 0;">
+                    <div
+                        style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                        <input type="hidden" id="admin-secret-key" value="">
+                        <!-- Deprecated but kept for safety in script -->
+                        <div class="form-group">
                             <label for="centro_votacion" class="form-label">Centro de Votación</label>
                             <input type="text" id="centro_votacion" class="form-control"
-                                placeholder="Ej. Centro Escolar General Francisco Morazán" required>
+                                placeholder="Nombre de la escuela o sede" required>
                         </div>
-                        <div class="form-group" style="margin-bottom: 0;">
+                        <div class="form-group">
                             <label for="jrv" class="form-label">Número de JRV</label>
                             <input type="number" id="jrv" class="form-control" placeholder="Ej. 1045" required min="1">
                         </div>
@@ -81,40 +94,54 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="zona" class="form-label">Zona</label>
+                            <label for="zona" class="form-label">Zona (Municipio Nuevo)</label>
                             <select id="zona" class="form-control" required disabled>
                                 <option value="">Seleccione Zona</option>
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <label for="municipio" class="form-label">Distrito</label>
+                            <label for="municipio" class="form-label">Distrito (Municipio Antiguo)</label>
                             <select id="municipio" class="form-control" required disabled>
                                 <option value="">Seleccione Distrito</option>
                             </select>
                         </div>
                     </div>
 
-                    <h3 class="form-label"
-                        style="font-size: 1.125rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
-                        Registro de Votos Válidos</h3>
-
-                    <div class="votos-grid" id="partidos-votos-container">
-                        <div style="grid-column: span 2; text-align: center; padding: 2rem; color: var(--text-muted);">
-                            Cargando partidos...
+                    <div style="background: #F1F5F9; padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;">
+                        <h3 class="card-title" style="margin-bottom: 1rem; color: #475569;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                <path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                            </svg>
+                            Conteo de Votos Válidos
+                        </h3>
+                        <div class="votos-grid" id="partidos-votos-container">
+                            <div
+                                style="grid-column: span 2; text-align: center; padding: 2rem; color: var(--text-muted);">
+                                Cargando partidos...
+                            </div>
                         </div>
-                        <!-- Inputs generados dinámicamente -->
                     </div>
 
-                    <div style="margin-top: 2rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
-                        <button type="submit" class="btn btn-primary"
-                            style="width: 100%; font-size: 1.125rem; padding: 1rem;">
-                            Guardar Acta Electoral
-                        </button>
-                    </div>
+                    <button type="submit" class="btn btn-primary btn-block"
+                        style="padding: 1.25rem; font-size: 1.1rem; border-radius: 12px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                            <polyline points="7 3 7 8 15 8"></polyline>
+                        </svg>
+                        Transmitir Acta al Sistema Central
+                    </button>
                 </form>
             </div>
         </div>
+    </div>
+    </form>
+    </div>
+    </div>
     </div>
 
     <!-- Scripts -->
