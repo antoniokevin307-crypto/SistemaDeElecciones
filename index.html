@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conteo de Votos SV - En Vivo</title>
+    <!-- Google Fonts for Modern Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <nav class="navbar">
+        <a href="index.html" class="nav-brand">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+            Elecciones SV
+        </a>
+        <div class="nav-links">
+            <a href="index.html" class="active">Resultados</a>
+            <a href="login.html">Acceso Admin</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header class="page-header">
+            <h1 class="page-title">Dashboard Electoral</h1>
+            <p class="page-subtitle">Resultados en tiempo real basados en el conteo de actas a nivel nacional.</p>
+        </header>
+
+        <div class="dashboard-grid">
+            <!-- KPIS -->
+            <div class="card stat-card">
+                <span class="stat-label">Total Votos Emitidos</span>
+                <span class="stat-value" id="stat-total-votos">0</span>
+            </div>
+
+            <div class="card stat-card">
+                <span class="stat-label">Actas Procesadas</span>
+                <span class="stat-value" id="stat-actas">0</span>
+            </div>
+
+            <div class="card stat-card">
+                <span class="stat-label">Participación Estimada</span>
+                <div class="stat-value" id="stat-participacion">0%</div>
+                <div class="progress-container">
+                    <div class="progress-bar" id="progress-participacion"></div>
+                </div>
+            </div>
+
+            <!-- Gráfico de Dona -->
+            <div class="card pie-card fade-in" style="animation-delay: 0.1s;">
+                <h2 class="card-title">Distribución General</h2>
+                <div class="chart-container-wrapper">
+                    <canvas id="pieChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Gráfico de Barras -->
+            <div class="card chart-card fade-in" style="animation-delay: 0.2s;">
+                <h2 class="card-title">Tendencia de Votos por Partido</h2>
+                <div class="chart-container-wrapper">
+                    <canvas id="barChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Tabla de Resultados Globales -->
+            <div class="card fade-in" style="grid-column: span 12; animation-delay: 0.3s;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <h2 class="card-title" style="margin-bottom: 0;">Detalle por Partido Político</h2>
+                    <button class="btn btn-primary" onclick="window.exportGlobalPDF()"
+                        style="padding: 0.5rem 1rem; font-size: 0.875rem;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            style="margin-right: 0.5rem;">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Reporte Global PDF
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Partido</th>
+                                <th>Sigla</th>
+                                <th>Votos Totales</th>
+                                <th>Porcentaje</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-resultados">
+                            <tr>
+                                <td colspan="4" style="text-align: center; color: var(--text-muted);">Cargando datos...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Historial de Actas Ingresadas (JRV) -->
+            <div class="card fade-in" style="grid-column: span 12; animation-delay: 0.4s; margin-top: 1rem;">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
+                    <h2 class="card-title" style="margin-bottom: 0;">Actas Procesadas (JRV Recientes)</h2>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <select id="filter-departamento" class="form-control"
+                            style="width: auto; padding: 0.4rem 0.8rem; font-size: 0.875rem;"
+                            onchange="renderActasList()">
+                            <option value="">Todos los Deptos.</option>
+                            <!-- Llenados dinamicamente desde JS -->
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="table-actas">
+                        <thead>
+                            <tr>
+                                <th>Fecha Receptora</th>
+                                <th>Centro de Votación</th>
+                                <th>Ubicación (M/D)</th>
+                                <th>No. JRV</th>
+                                <th>Acción Exportar</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-actas-list">
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: var(--text-muted);">Cargando actas...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Script Tags and Setup -->
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- jsPDF and AutoTable -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+    <script src="supabase.js"></script>
+    <script src="charts.js"></script>
+    <script src="app.js"></script>
+    <script>
+        // Init logic purely for index.html view
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof initDashboard === 'function') {
+                initDashboard();
+            }
+        });
+    </script>
+</body>
+
+</html>
