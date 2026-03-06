@@ -93,14 +93,15 @@ function updateCharts(partidos, votosTotalesMap) {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                cutout: '65%',
+                cutout: '75%',
                 plugins: {
                     legend: {
-                        position: 'right',
+                        position: 'left',
+                        align: 'start',
                         labels: {
                             usePointStyle: true,
-                            padding: 20,
-                            font: { size: 12, weight: '500' }
+                            padding: 12,
+                            font: { size: 10, weight: '600' }
                         }
                     },
                     tooltip: {
