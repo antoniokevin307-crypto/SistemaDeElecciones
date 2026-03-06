@@ -110,6 +110,21 @@ async function initDashboard() {
     initCharts(); // from charts.js
     const partidos = await loadPartidos();
 
+    // Lógica de Acceso Oculto (Easter Egg)
+    let clickCount = 0;
+    const logo = document.getElementById('nav-brand-logo');
+    if (logo) {
+        logo.addEventListener('click', (e) => {
+            e.preventDefault();
+            clickCount++;
+            if (clickCount >= 5) {
+                window.location.href = 'login.html';
+            }
+            // Reset counter after 3 seconds of inactivity
+            setTimeout(() => { clickCount = 0; }, 3000);
+        });
+    }
+
     // Configurar Realtime Subscription antes de cargar inicialmente
     setupRealtimeSubscription(partidos);
 
