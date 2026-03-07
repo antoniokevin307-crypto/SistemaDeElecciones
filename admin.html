@@ -63,48 +63,47 @@
                         style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
                         <input type="hidden" id="admin-secret-key" value="">
                         <!-- Deprecated but kept for safety in script -->
-                        <div class="form-group">
-                            <label for="centro_votacion" class="form-label">Centro de Votación</label>
-                            <input type="text" id="centro_votacion" class="form-control"
-                                placeholder="Nombre de la escuela o sede" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="jrv" class="form-label">Número de JRV</label>
-                            <input type="number" id="jrv" class="form-control" placeholder="Ej. 1045" required min="1">
-                        </div>
+                        <!-- GEOGRAFÍA BLOQUEADA A USULUTÁN NORTE -->
                         <div class="form-group">
                             <label for="departamento" class="form-label">Departamento</label>
-                            <select id="departamento" class="form-control" required>
-                                <option value="">Seleccione Departamento</option>
-                                <option value="Ahuachapán">Ahuachapán</option>
-                                <option value="Santa Ana">Santa Ana</option>
-                                <option value="Sonsonate">Sonsonate</option>
-                                <option value="Chalatenango">Chalatenango</option>
-                                <option value="La Libertad">La Libertad</option>
-                                <option value="San Salvador">San Salvador</option>
-                                <option value="Cuscatlán">Cuscatlán</option>
-                                <option value="La Paz">La Paz</option>
-                                <option value="Cabañas">Cabañas</option>
-                                <option value="San Vicente">San Vicente</option>
-                                <option value="Usulután">Usulután</option>
-                                <option value="San Miguel">San Miguel</option>
-                                <option value="Morazán">Morazán</option>
-                                <option value="La Unión">La Unión</option>
+                            <select id="departamento" class="form-control" disabled>
+                                <option value="Usulután" selected>Usulután</option>
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <label for="zona" class="form-label">Zona (Municipio Nuevo)</label>
-                            <select id="zona" class="form-control" required disabled>
-                                <option value="">Seleccione Zona</option>
+                            <label for="zona" class="form-label">Zona Municipal</label>
+                            <select id="zona" class="form-control" disabled>
+                                <option value="Usulután Norte" selected>Usulután Norte</option>
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <label for="municipio" class="form-label">Distrito (Municipio Antiguo)</label>
-                            <select id="municipio" class="form-control" required disabled>
+                            <label for="municipio" class="form-label">Distrito</label>
+                            <select id="municipio" class="form-control" required>
                                 <option value="">Seleccione Distrito</option>
+                                <option value="Alegría">Alegría</option>
+                                <option value="Berlín">Berlín</option>
+                                <option value="El Triunfo">El Triunfo</option>
+                                <option value="Estanzuelas">Estanzuelas</option>
+                                <option value="Jucuapa">Jucuapa</option>
+                                <option value="Mercedes Umaña">Mercedes Umaña</option>
+                                <option value="Nueva Granada">Nueva Granada</option>
+                                <option value="San Buenaventura">San Buenaventura</option>
+                                <option value="Santiago de María">Santiago de María</option>
                             </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="centro_votacion" class="form-label">Centro de Votación</label>
+                            <select id="centro_votacion" class="form-control" required disabled>
+                                <option value="">Seleccione un Distrito primero</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="jrv" class="form-label">Número de JRV</label>
+                            <input type="number" id="jrv" class="form-control" placeholder="Ej. 1" required min="1">
                         </div>
                     </div>
 
@@ -136,6 +135,47 @@
                         Transmitir Acta al Sistema Central
                     </button>
                 </form>
+            </div>
+        </div>
+        <div class="dashboard-grid" style="margin-top: 2rem;">
+            <div class="card" style="grid-column: span 12; max-width: 900px; margin: 0 auto;">
+                <h2 class="card-title"
+                    style="margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                        Mis Registros Recientes
+                    </div>
+                    <span id="txt-total-registros"
+                        style="font-size: 0.9rem; font-weight: 500; color: var(--text-muted);">Cargando...</span>
+                </h2>
+
+                <div style="overflow-x: auto;">
+                    <table class="results-table" style="margin-top: 0;">
+                        <thead>
+                            <tr>
+                                <th>JRV</th>
+                                <th>Centro de Votación</th>
+                                <th>Ubicación</th>
+                                <th>Fecha</th>
+                                <th style="text-align: right;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="user-actas-list">
+                            <tr>
+                                <td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                                    Buscando sus registros...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
