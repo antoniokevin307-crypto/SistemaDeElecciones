@@ -7,36 +7,37 @@ function initCharts() {
     Chart.defaults.color = '#64748B'; // var(--text-muted) equivalente
 }
 
-function updateCharts(partidos, votosTotalesMap) {
-    // Ordenar partidos por cantidad de votos de mayor a menor localmente para los charts
-    const partidosOrdenados = [...partidos].sort((a, b) => {
-        const votosA = votosTotalesMap[a.id] || 0;
-        const votosB = votosTotalesMap[b.id] || 0;
-        return votosB - votosA;
-    });
+function updateCharts(partidos, votosTotalesMap, tendenciaData = null) {
+    // 1. Datos para gráfico de Dona (Totales por Partido)
+    const partidosOrdenados = [...partidos].sort((a, b) => (votosTotalesMap[b.id] || 0) - (votosTotalesMap[a.id] || 0));
+    const labelsDonut = partidosOrdenados.map(p => p.sigla);
+    const dataDonut = partidosOrdenados.map(p => votosTotalesMap[p.id] || 0);
+    const colorsDonut = partidosOrdenados.map(p => p.color);
 
-    const labels = partidosOrdenados.map(p => p.sigla);
-    const data = partidosOrdenados.map(p => votosTotalesMap[p.id] || 0);
-    const backgroundColors = partidosOrdenados.map(p => p.color);
+    // 2. Datos para gráfico de Barras (Tendencia por Zona)
+    // Si no viene tendenciaData, usamos los totales (fallback)
+    const labelsBar = tendenciaData ? tendenciaData.labels : labelsDonut;
+    const valuesBar = tendenciaData ? tendenciaData.values : dataDonut;
+    const colorsBar = tendenciaData ? tendenciaData.colors : colorsDonut;
 
     // =======================================================
-    // GRÁFICO DE BARRAS
+    // GRÁGICO DE BARRAS (TENDENCIA)
     // =======================================================
     const barCtx = document.getElementById('barChart').getContext('2d');
     if (barChartInstance) {
-        barChartInstance.data.labels = labels;
-        barChartInstance.data.datasets[0].data = data;
-        barChartInstance.data.datasets[0].backgroundColor = backgroundColors;
+        barChartInstance.data.labels = labelsBar;
+        barChartInstance.data.datasets[0].data = valuesBar;
+        barChartInstance.data.datasets[0].backgroundColor = colorsBar;
         barChartInstance.update();
     } else {
         barChartInstance = new Chart(barCtx, {
             type: 'bar',
             data: {
-                labels: labels,
+                labels: labelsBar,
                 datasets: [{
-                    label: 'Votos Totales',
-                    data: data,
-                    backgroundColor: backgroundColors,
+                    label: 'Votos Ganador',
+                    data: valuesBar,
+                    backgroundColor: colorsBar,
                     borderRadius: 6,
                     borderSkipped: false
                 }]
@@ -47,47 +48,44 @@ function updateCharts(partidos, votosTotalesMap) {
                 plugins: {
                     legend: { display: false },
                     tooltip: {
-                        padding: 12,
-                        cornerRadius: 8,
-                        titleFont: { size: 14, weight: 'bold' },
-                        bodyFont: { size: 14 }
+                        callbacks: {
+                            label: (ctx) => {
+                                let label = `Votos: ${ctx.parsed.y.toLocaleString()}`;
+                                if (tendenciaData && tendenciaData.names && tendenciaData.names[ctx.dataIndex]) {
+                                    return [`Partido: ${tendenciaData.names[ctx.dataIndex]}`, label];
+                                }
+                                return label;
+                            }
+                        }
                     }
                 },
                 scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: { color: '#E2E8F0', drawBorder: false },
-                        border: { display: false }
-                    },
-                    x: {
-                        grid: { display: false },
-                        border: { display: false }
-                    }
+                    y: { beginAtZero: true, grid: { color: '#E2E8F0', drawBorder: false } },
+                    x: { grid: { display: false } }
                 }
             }
         });
     }
 
     // =======================================================
-    // GRÁFICO DE DONA (DISTRIBUCIÓN)
+    // GRÁGICO DE DONA (DISTRIBUCIÓN TOTAL)
     // =======================================================
     const pieCtx = document.getElementById('pieChart').getContext('2d');
     if (pieChartInstance) {
-        pieChartInstance.data.labels = labels;
-        pieChartInstance.data.datasets[0].data = data;
-        pieChartInstance.data.datasets[0].backgroundColor = backgroundColors;
+        pieChartInstance.data.labels = labelsDonut;
+        pieChartInstance.data.datasets[0].data = dataDonut;
+        pieChartInstance.data.datasets[0].backgroundColor = colorsDonut;
         pieChartInstance.update();
     } else {
         pieChartInstance = new Chart(pieCtx, {
             type: 'doughnut',
             data: {
-                labels: labels,
+                labels: labelsDonut,
                 datasets: [{
-                    data: data,
-                    backgroundColor: backgroundColors,
+                    data: dataDonut,
+                    backgroundColor: colorsDonut,
                     borderWidth: 2,
                     borderColor: '#ffffff',
-                    hoverOffset: 4
                 }]
             },
             options: {
@@ -97,26 +95,15 @@ function updateCharts(partidos, votosTotalesMap) {
                 plugins: {
                     legend: {
                         position: 'left',
-                        align: 'start',
-                        labels: {
-                            usePointStyle: true,
-                            padding: 12,
-                            font: { size: 10, weight: '600' }
-                        }
+                        labels: { usePointStyle: true, font: { size: 10, weight: '600' } }
                     },
                     tooltip: {
-                        padding: 12,
-                        cornerRadius: 8,
                         callbacks: {
                             label: function (context) {
                                 let label = context.label || '';
-                                if (label) { label += ': '; }
-                                if (context.parsed !== null) {
-                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                    const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(2) + '%' : '0%';
-                                    label += context.parsed + ' votos (' + percentage + ')';
-                                }
-                                return label;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = total > 0 ? ((context.parsed / total) * 100).toFixed(2) + '%' : '0%';
+                                return `${label}: ${context.parsed.toLocaleString()} votos (${percentage})`;
                             }
                         }
                     }
