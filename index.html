@@ -33,11 +33,36 @@
                 style="display: inline-block; padding: 0.5rem 1rem; background: #E0F2FE; color: #0369A1; border-radius: 999px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem;">
                 🔵 Escrutinio Final Oficial
             </div>
-            <header class="page-header" style="text-align: left; margin-bottom: 0;">
-                <h1 class="page-title" style="margin-left: 0;">Dashboard Electoral SV</h1>
-                <p class="page-subtitle" style="margin-left: 0;">Siga en tiempo real la consolidación de votos de todo
-                    el
-                    país.</p>
+            <header class="page-header" style="text-align: left; margin-bottom: 2rem;">
+                <h1 class="page-title" style="margin-left: 0;">Usulután Norte: Escrutinio 2024</h1>
+                <p class="page-subtitle" style="margin-left: 0;">Resultados en tiempo real para los 9 distritos del
+                    municipio.</p>
+
+                <!-- FILTROS REGIONALES -->
+                <div
+                    style="display: flex; gap: 1rem; margin-top: 1.5rem; flex-wrap: wrap; background: white; padding: 1.5rem; border-radius: 16px; border: 1px solid #E2E8F0; box-shadow: var(--shadow-sm);">
+                    <div class="form-group" style="flex: 1; min-width: 200px; margin-bottom: 0;">
+                        <label for="filter-distrito-dash" class="form-label">Elegir Distrito</label>
+                        <select id="filter-distrito-dash" class="form-control" style="background-color: white;">
+                            <option value="">— Ver Todo el Municipio —</option>
+                            <option value="Alegría">Alegría</option>
+                            <option value="Berlín">Berlín</option>
+                            <option value="El Triunfo">El Triunfo</option>
+                            <option value="Estanzuelas">Estanzuelas</option>
+                            <option value="Jucuapa">Jucuapa</option>
+                            <option value="Mercedes Umaña">Mercedes Umaña</option>
+                            <option value="Nueva Granada">Nueva Granada</option>
+                            <option value="San Buenaventura">San Buenaventura</option>
+                            <option value="Santiago de María">Santiago de María</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="flex: 1; min-width: 250px; margin-bottom: 0;">
+                        <label for="filter-centro-dash" class="form-label">Filtrar por Centro de Votación</label>
+                        <select id="filter-centro-dash" class="form-control" disabled style="background-color: white;">
+                            <option value="">Todos los Centros</option>
+                        </select>
+                    </div>
+                </div>
             </header>
         </div>
 
@@ -47,18 +72,17 @@
                 <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
                     <div style="flex: 1; min-width: 300px;">
                         <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem;">Garantía de Transparencia</h2>
-                        <p style="opacity: 0.9; font-size: 0.95rem;">Cada acta procesada en este sistema es verificada y
-                            subida por digitadores autorizados. Los datos se actualizan automáticamente cada vez que se
-                            recibe una nueva JRV.</p>
+                        <p style="opacity: 0.9; font-size: 0.95rem;">Monitoreo exclusivo de los centros escolares y de
+                            votación en Usulután Norte. Datos procesados directamente desde las actas JRV oficiales.</p>
                     </div>
                     <div style="display: flex; gap: 2rem;">
                         <div style="text-align: center;">
-                            <div style="font-size: 1.5rem; font-weight: 800;">262</div>
+                            <div style="font-size: 1.5rem; font-weight: 800;">9</div>
                             <div style="font-size: 0.7rem; text-transform: uppercase; opacity: 0.8;">Distritos</div>
                         </div>
                         <div style="text-align: center;">
-                            <div style="font-size: 1.5rem; font-weight: 800;">44</div>
-                            <div style="font-size: 0.7rem; text-transform: uppercase; opacity: 0.8;">Municipios</div>
+                            <div style="font-size: 1.5rem; font-weight: 800;" id="txt-count-centros">16</div>
+                            <div style="font-size: 0.7rem; text-transform: uppercase; opacity: 0.8;">C. Votación</div>
                         </div>
                         <div style="text-align: center;">
                             <div style="font-size: 1.5rem; font-weight: 800;">100%</div>
@@ -80,7 +104,7 @@
             </div>
 
             <div class="card stat-card fade-in" style="animation-delay: 0.3s;">
-                <span class="stat-label">Participación</span>
+                <span class="stat-label">Participación <span id="txt-participacion-context">(Municipio)</span></span>
                 <div class="stat-value" id="stat-participacion">0%</div>
                 <div class="progress-container">
                     <div class="progress-bar" id="progress-participacion"></div>
@@ -144,14 +168,6 @@
                 <div
                     style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
                     <h2 class="card-title" style="margin-bottom: 0;">Actas Procesadas (JRV Recientes)</h2>
-                    <div style="display: flex; gap: 0.5rem;">
-                        <select id="filter-departamento" class="form-control"
-                            style="width: auto; padding: 0.4rem 0.8rem; font-size: 0.875rem;"
-                            onchange="renderActasList()">
-                            <option value="">Todos los Deptos.</option>
-                            <!-- Llenados dinamicamente desde JS -->
-                        </select>
-                    </div>
                 </div>
 
                 <div class="table-container">
