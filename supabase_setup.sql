@@ -30,12 +30,12 @@ CREATE TABLE public.partidos (
 CREATE TABLE public.actas (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     centro_votacion VARCHAR(255) NOT NULL,
-    jrv INTEGER NOT NULL UNIQUE, -- Una JRV no puede tener dos actas
+    jrv INTEGER NOT NULL, -- Ahora la unicidad es compuesta
     departamento VARCHAR(100) NOT NULL,
     zona VARCHAR(100) NOT NULL, -- Nueva columna para la Zona (44 Municipios)
     municipio VARCHAR(100) NOT NULL, -- Aquí se guardará el Distrito (262 distritos)
     user_id UUID REFERENCES auth.users(id) NOT NULL, -- Quién subió el acta
-    fecha TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+    UNIQUE(jrv, municipio, departamento) -- Unicidad por distrito
 );
 
 -- 3. Crear tabla VOTOS (Relacionados a un acta y un partido)
@@ -97,9 +97,15 @@ CREATE POLICY "Actas son públicas para lectura" ON public.actas
 -- ACTAS (Inserción solo admins/superadmins)
 CREATE POLICY "Admins pueden insertar actas" ON public.actas
     FOR INSERT WITH CHECK (auth.role() = 'authenticated');
--- ACTAS (Borrado SOLO superadmin)
-CREATE POLICY "SuperAdmins pueden borrar actas" ON public.actas
+
+-- ACTAS (Actualización SOLO el dueño del registro)
+CREATE POLICY "Admins pueden actualizar sus propias actas" ON public.actas
+    FOR UPDATE USING (auth.uid() = user_id);
+
+-- ACTAS (Borrado el dueño o superadmin)
+CREATE POLICY "Admins pueden borrar sus propias actas" ON public.actas
     FOR DELETE USING (
+        auth.uid() = user_id OR 
         EXISTS (
             SELECT 1 FROM public.perfiles
             WHERE id = auth.uid() AND rol = 'superadmin'
@@ -112,6 +118,25 @@ CREATE POLICY "Votos son públicos para lectura" ON public.votos
 -- VOTOS (Inserción solo admins/superadmins)
 CREATE POLICY "Admins pueden insertar votos" ON public.votos
     FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+
+-- VOTOS (Actualización por el dueño del acta)
+CREATE POLICY "Admins pueden actualizar sus propios votos" ON public.votos
+    FOR UPDATE USING (
+        EXISTS (
+            SELECT 1 FROM public.actas
+            WHERE actas.id = votos.acta_id AND actas.user_id = auth.uid()
+        )
+    );
+
+-- VOTOS (Borrado por el dueño del acta para permitir edición)
+CREATE POLICY "Admins pueden borrar sus propios votos" ON public.votos
+    FOR DELETE USING (
+        EXISTS (
+            SELECT 1 FROM public.actas
+            WHERE actas.id = votos.acta_id AND actas.user_id = auth.uid()
+        )
+    );
+
 -- El borrado de votos ocurre automáticamente en cascada al borrar un acta (ON DELETE CASCADE)
 
 -- ==========================================
