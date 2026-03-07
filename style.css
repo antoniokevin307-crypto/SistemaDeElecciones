@@ -478,7 +478,121 @@ tbody tr {
 }
 
 .partido-color-indicator {
-    width: 16px;
-    height: 16px;
     border-radius: 4px;
+}
+
+/* TABLES */
+.results-table,
+.table-actas {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-top: 1rem;
+}
+
+.table-actas th {
+    text-align: left;
+    padding: 1.25rem 1rem;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    border-bottom: 2px solid #F1F5F9;
+    background-color: #F8FAFC;
+}
+
+.table-actas td {
+    padding: 1.5rem 1rem;
+    border-bottom: 1px solid #F1F5F9;
+    font-size: 0.95rem;
+    vertical-align: middle;
+}
+
+.table-actas tr:last-child td {
+    border-bottom: none;
+}
+
+.table-actas tr {
+    transition: all 0.2s ease;
+}
+
+.table-actas tr:hover td {
+    background-color: #FBFDFF;
+}
+
+/* ACTION BUTTONS IN TABLES */
+.btn-download-acta {
+    background: #F1F5F9;
+    border: 1px solid #E2E8F0;
+    color: var(--sv-blue);
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+
+.btn-download-acta:hover {
+    background: var(--sv-blue);
+    color: white;
+    border-color: var(--sv-blue);
+    transform: scale(1.05);
+}
+
+.badge-jrv {
+    background: #E0F2FE;
+    color: var(--sv-blue);
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    font-weight: 800;
+    font-size: 0.85rem;
+}
+
+/* UTILS */
+.hidden {
+    display: none !important;
+}
+
+.alert {
+    padding: 1rem 1.5rem;
+    border-radius: var(--radius-md);
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+    animation: slideIn 0.3s ease-out;
+}
+
+.alert-success {
+    background-color: #DCFCE7;
+    color: #166534;
+    border: 1px solid #BBF7D0;
+}
+
+.alert-error {
+    background-color: #FEE2E2;
+    color: #991B1B;
+    border: 1px solid #FECACA;
+}
+
+.alert-info {
+    background-color: #E0F2FE;
+    color: #075985;
+    border: 1px solid #BAE6FD;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-10px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
