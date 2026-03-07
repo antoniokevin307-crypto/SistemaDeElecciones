@@ -219,7 +219,7 @@ async function renderDashboardData(partidos) {
 
     // 2. Obtener sumatoria de votos
     // Para filtrar votos por geografía necesitamos unir con actas
-    let queryVotos = supabaseClient.from('votos').select('cantidad, partido_id, actas!inner(municipio, centro_votacion)');
+    let queryVotos = supabaseClient.from('votos').select('cantidad, partido_id, actas!inner(municipio, centro_votacion, jrv)');
     if (selDistrito) queryVotos = queryVotos.eq('actas.municipio', selDistrito);
     if (selCentro) queryVotos = queryVotos.eq('actas.centro_votacion', selCentro);
 
@@ -283,7 +283,13 @@ async function renderDashboardData(partidos) {
     // Calcular Ganadores por Zona para el Bar Chart
     let dataTendencia = {}; // { zonaName: { partidoId: totalVotos } }
     (votosData || []).forEach(voto => {
-        const zonaKey = selDistrito ? voto.actas.centro_votacion : voto.actas.municipio;
+        let zonaKey = voto.actas.municipio; // Global
+        if (selCentro) {
+            zonaKey = `JRV #${voto.actas.jrv}`; // Nivel Centro -> JRVs
+        } else if (selDistrito) {
+            zonaKey = voto.actas.centro_votacion; // Nivel Distrito -> Centros
+        }
+
         if (!dataTendencia[zonaKey]) dataTendencia[zonaKey] = {};
         dataTendencia[zonaKey][voto.partido_id] = (dataTendencia[zonaKey][voto.partido_id] || 0) + voto.cantidad;
     });

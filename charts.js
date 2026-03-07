@@ -8,6 +8,8 @@ function initCharts() {
 }
 
 function updateCharts(partidos, votosTotalesMap, tendenciaData = null) {
+    const isMobile = window.innerWidth <= 768;
+
     // 1. Datos para gráfico de Dona (Totales por Partido)
     const partidosOrdenados = [...partidos].sort((a, b) => (votosTotalesMap[b.id] || 0) - (votosTotalesMap[a.id] || 0));
     const labelsDonut = partidosOrdenados.map(p => p.sigla);
@@ -15,7 +17,6 @@ function updateCharts(partidos, votosTotalesMap, tendenciaData = null) {
     const colorsDonut = partidosOrdenados.map(p => p.color);
 
     // 2. Datos para gráfico de Barras (Tendencia por Zona)
-    // Si no viene tendenciaData, usamos los totales (fallback)
     const labelsBar = tendenciaData ? tendenciaData.labels : labelsDonut;
     const valuesBar = tendenciaData ? tendenciaData.values : dataDonut;
     const colorsBar = tendenciaData ? tendenciaData.colors : colorsDonut;
@@ -25,6 +26,7 @@ function updateCharts(partidos, votosTotalesMap, tendenciaData = null) {
     // =======================================================
     const barCtx = document.getElementById('barChart').getContext('2d');
     if (barChartInstance) {
+        barChartInstance.options.indexAxis = isMobile ? 'y' : 'x';
         barChartInstance.data.labels = labelsBar;
         barChartInstance.data.datasets[0].data = valuesBar;
         barChartInstance.data.datasets[0].backgroundColor = colorsBar;
@@ -43,6 +45,7 @@ function updateCharts(partidos, votosTotalesMap, tendenciaData = null) {
                 }]
             },
             options: {
+                indexAxis: isMobile ? 'y' : 'x',
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
@@ -50,7 +53,7 @@ function updateCharts(partidos, votosTotalesMap, tendenciaData = null) {
                     tooltip: {
                         callbacks: {
                             label: (ctx) => {
-                                let label = `Votos: ${ctx.parsed.y.toLocaleString()}`;
+                                let label = `Votos: ${ctx.parsed[isMobile ? 'x' : 'y'].toLocaleString()}`;
                                 if (tendenciaData && tendenciaData.names && tendenciaData.names[ctx.dataIndex]) {
                                     return [`Partido: ${tendenciaData.names[ctx.dataIndex]}`, label];
                                 }
@@ -60,8 +63,15 @@ function updateCharts(partidos, votosTotalesMap, tendenciaData = null) {
                     }
                 },
                 scales: {
-                    y: { beginAtZero: true, grid: { color: '#E2E8F0', drawBorder: false } },
-                    x: { grid: { display: false } }
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: '#E2E8F0', drawBorder: false },
+                        ticks: { font: { size: isMobile ? 10 : 12 } }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { font: { size: isMobile ? 10 : 12 } }
+                    }
                 }
             }
         });
@@ -72,6 +82,7 @@ function updateCharts(partidos, votosTotalesMap, tendenciaData = null) {
     // =======================================================
     const pieCtx = document.getElementById('pieChart').getContext('2d');
     if (pieChartInstance) {
+        pieChartInstance.options.plugins.legend.position = isMobile ? 'top' : 'left';
         pieChartInstance.data.labels = labelsDonut;
         pieChartInstance.data.datasets[0].data = dataDonut;
         pieChartInstance.data.datasets[0].backgroundColor = colorsDonut;
@@ -94,8 +105,12 @@ function updateCharts(partidos, votosTotalesMap, tendenciaData = null) {
                 cutout: '75%',
                 plugins: {
                     legend: {
-                        position: 'left',
-                        labels: { usePointStyle: true, font: { size: 10, weight: '600' } }
+                        position: isMobile ? 'top' : 'left',
+                        labels: {
+                            usePointStyle: true,
+                            font: { size: isMobile ? 9 : 10, weight: '600' },
+                            padding: isMobile ? 10 : 20
+                        }
                     },
                     tooltip: {
                         callbacks: {
